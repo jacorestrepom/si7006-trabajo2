@@ -1,0 +1,42 @@
+== Rama 1: departamentos con menos competencia
+departamento_entidad | procesos_con_ofertas | pct_un_oferente | promedio_oferentes
+ARAUCA | 4700 | 67.6 | 1.71
+BOYACA | 29924 | 66.4 | 2.03
+CAQUETA | 5887 | 64.3 | 2.12
+PUTUMAYO | 4180 | 63.8 | 1.93
+CASANARE | 7317 | 61.4 | 1.91
+LA GUAJIRA | 4677 | 61.1 | 2.13
+META | 12069 | 59.2 | 2.19
+AMAZONAS | 2047 | 58.9 | 2.08
+NORTE DE SANTANDER | 10831 | 58.8 | 2.12
+ANTIOQUIA | 52411 | 56.2 | 2.71
+
+== Rama 1: total nacional
+procesos_con_ofertas | pct_un_oferente
+447799 | 47.4
+
+== Rama 2: top presupuesto
+tipo_de_contrato | modalidad_de_contratacion | num_procesos | presupuesto_miles_millones_cop | precio_mediano_millones_cop | es_contratacion_directa
+Otro | Contratación régimen especial | 139373 | 228312.17 | 45.0 | false
+Prestación de servicios | Contratación régimen especial | 1521630 | 188105.14 | 8.7 | false
+Obra | Licitación pública Obra Publica | 12780 | 183324.67 | 2758.16 | false
+Prestación de servicios | Contratación directa | 3130675 | 134888.18 | 17.2 | true
+Decreto 092 de 2017 | Contratación régimen especial | 1222022 | 109845.49 | 8.04 | false
+Prestación de servicios | Selección Abreviada de Menor Cuantía | 67011 | 85895.15 | 233.27 | false
+Prestación de servicios | Licitación pública | 12076 | 78532.75 | 1790.67 | false
+Otro | Contratación directa | 59002 | 75581.82 | 148.03 | true
+Otro | Contratación Directa (con ofertas) | 38030 | 64880.09 | 160.0 | true
+Obra | Contratación régimen especial | 31527 | 58095.47 | 27.73 | false
+
+== Rama 2: contratacion directa vs resto
+es_contratacion_directa | procesos | presupuesto_miles_millones_cop | pct_procesos | pct_presupuesto
+false | 4159780 | 1303426.2 | 55.8 | 79.6
+true | 3292261 | 334775.5 | 44.2 | 20.4
+
+== Particiones
+anio_publicacion | procesos | max_precio
+2022 | 986054 | 4.78128E12
+2023 | 1468513 | 4.09304E12
+2024 | 1598448 | 4.695516E12
+2025 | 1855301 | 4.205027751839E12
+2026 | 1543755 | 4.931665931665E12
