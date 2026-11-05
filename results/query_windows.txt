@@ -1,0 +1,56 @@
+42 ventanas (modalidad x minuto)
+
+ventana           modalidad                                conteo  promedio (M COP)
+2026-11-05T20:21  Concurso de méritos abierto                   4          3,884.66
+2026-11-05T20:21  Contratación directa                         94             89.35
+2026-11-05T20:21  Contratación régimen especial                15            276.73
+2026-11-05T20:21  Licitación pública                            5          2,767.95
+2026-11-05T20:21  Mínima cuantía                               20             20.41
+2026-11-05T20:21  Selección abreviada de menor cuantía          9            734.71
+2026-11-05T20:22  Concurso de méritos abierto                   6          2,060.01
+2026-11-05T20:22  Contratación directa                        158             99.74
+2026-11-05T20:22  Contratación régimen especial                40            517.69
+2026-11-05T20:22  Licitación pública                            5          1,382.37
+2026-11-05T20:22  Mínima cuantía                               40             25.04
+2026-11-05T20:22  Selección abreviada de menor cuantía         14            728.20
+2026-11-05T20:23  Concurso de méritos abierto                   4          1,171.04
+2026-11-05T20:23  Contratación directa                         98             88.17
+2026-11-05T20:23  Contratación régimen especial                21            414.15
+2026-11-05T20:23  Licitación pública                            5          8,552.98
+2026-11-05T20:23  Mínima cuantía                               29             13.52
+2026-11-05T20:23  Selección abreviada de menor cuantía          5            550.15
+2026-11-05T20:24  Concurso de méritos abierto                   7            674.13
+2026-11-05T20:24  Contratación directa                        124            113.64
+2026-11-05T20:24  Contratación régimen especial                27            437.48
+2026-11-05T20:24  Licitación pública                           14          4,604.59
+2026-11-05T20:24  Mínima cuantía                               26             19.45
+2026-11-05T20:24  Selección abreviada de menor cuantía          4            614.19
+2026-11-05T20:25  Concurso de méritos abierto                   7          1,201.96
+2026-11-05T20:25  Contratación directa                         97            172.75
+2026-11-05T20:25  Contratación régimen especial                19            260.98
+2026-11-05T20:25  Licitación pública                            6          2,629.14
+2026-11-05T20:25  Mínima cuantía                               17             16.58
+2026-11-05T20:25  Selección abreviada de menor cuantía          7            546.86
+2026-11-05T20:26  Concurso de méritos abierto                   7            741.06
+2026-11-05T20:26  Contratación directa                        142             89.84
+2026-11-05T20:26  Contratación régimen especial                32            375.28
+2026-11-05T20:26  Licitación pública                            4          9,321.66
+2026-11-05T20:26  Mínima cuantía                               22             27.34
+2026-11-05T20:26  Selección abreviada de menor cuantía         12            675.07
+2026-11-05T20:27  Concurso de méritos abierto                   2          3,399.93
+2026-11-05T20:27  Contratación directa                         52             86.31
+2026-11-05T20:27  Contratación régimen especial                12            407.21
+2026-11-05T20:27  Licitación pública                            3         10,104.06
+2026-11-05T20:27  Mínima cuantía                                6             22.55
+2026-11-05T20:27  Selección abreviada de menor cuantía          3          1,144.64
+
+Resumen por modalidad (todas las ventanas):
+modalidad                                eventos eventos/min  promedio (M COP)
+Contratación directa                         765       109.3            105.74
+Contratación régimen especial                166        23.7            404.95
+Mínima cuantía                               160        22.9             20.79
+Selección abreviada de menor cuantía          54         7.7            692.18
+Licitación pública                            42         6.0          5,032.25
+Concurso de méritos abierto                   37         5.3          1,559.54
+
+Query por llave de particion modalidad = 'Licitación pública': 7 ventanas
