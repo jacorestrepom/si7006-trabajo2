@@ -1,0 +1,14 @@
+{
+  "publicados": 1400,
+  "unicos_validos": 1224,
+  "repetidos": 86,
+  "invalidos": 90,
+  "invalidos_por_tipo": {
+    "json_malo": 21,
+    "precio_alto": 14,
+    "sin_event_id": 15,
+    "precio_negativo": 21,
+    "sin_modalidad": 19
+  },
+  "fin": "2026-11-05T20:27:25.399307+00:00"
+}

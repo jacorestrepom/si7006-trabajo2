@@ -1,0 +1,41 @@
+{
+  "Comment": "Pipeline batch SECOP II: Glue inicial (limpieza + join + Parquet) y dos agrupaciones en paralelo",
+  "StartAt": "LimpiarYUnir",
+  "States": {
+    "LimpiarYUnir": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Arguments": { "JobName": "secop-clean-join" },
+      "Next": "AgrupacionesEnParalelo"
+    },
+    "AgrupacionesEnParalelo": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "CompetenciaPorDepartamento",
+          "States": {
+            "CompetenciaPorDepartamento": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::glue:startJobRun.sync",
+              "Arguments": { "JobName": "secop-agg-competencia" },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "PresupuestoPorModalidad",
+          "States": {
+            "PresupuestoPorModalidad": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::glue:startJobRun.sync",
+              "Arguments": { "JobName": "secop-agg-modalidad" },
+              "End": true
+            }
+          }
+        }
+      ],
+      "End": true
+    }
+  },
+  "QueryLanguage": "JSONata"
+}
