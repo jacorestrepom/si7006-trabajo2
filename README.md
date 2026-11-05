@@ -148,7 +148,7 @@ El Learner Lab solo permite workers G.1X o Standard, máximo 10 workers y concur
 **Qué hace el trabajo inicial (`secop_clean_join.py`)**
 
 - **Lee** los CSV de procesos y proponentes desde `raw/`.
-- **Corrige**: quita espacios repetidos; convierte a nulo los textos vacíos o "No definido"; pasa a nulo precios, valores adjudicados y duraciones negativos o en cero; normaliza el departamento a mayúsculas sin tildes (para que "Bogotá" y "BOGOTA" agrupen igual); convierte `adjudicado` a booleano; extrae el segmento UNSPSC del código de categoría.
+- **Corrige**: quita espacios repetidos; convierte a nulo los textos vacíos o "No definido"; pasa a nulo precios y valores adjudicados negativos, en cero o mayores que 5 billones de COP (errores de digitación: había 21 procesos así, el mayor de 2,7 × 10¹⁶ COP) y duraciones negativas; normaliza el departamento a mayúsculas sin tildes (para que "Bogotá" y "BOGOTA" agrupen igual); convierte `adjudicado` a booleano; extrae el segmento UNSPSC del código de categoría.
 - **Descarta**: registros sin identificador del proceso, sin fecha de publicación válida o fuera de 2022-2026; **duplicados** del mismo `id_del_proceso` (se conserva la fila más reciente); proponentes sin proceso o sin proveedor y proponentes repetidos en el mismo proceso.
 - **Une (join)** por la columna común `id_del_proceso` = `id_procedimiento`: a cada proceso le agrega `num_proponentes` (empresas distintas que ofertaron) y `tiene_competencia` (2 o más oferentes). Es un *left join*: los procesos sin ofertas quedan con 0.
 - **Escribe** Parquet en `curated/procesos/`, **particionado por `anio_publicacion`**.
@@ -171,7 +171,7 @@ La definición tiene un estado `LimpiarYUnir` (Glue `startJobRun.sync`, que espe
 ### A5. Horario de Amazon EventBridge Scheduler
 
 1. **EventBridge → Scheduler → Schedules → Create schedule**, nombre `secop-batch-diario`.
-2. *Recurring schedule*, zona horaria `America/Bogota`, *Cron-based*: `cron(42 15 * * ? *)` (todos los días a las 15:42), *Flexible time window*: Off.
+2. *Recurring schedule*, zona horaria `America/Bogota`, *Cron-based*: `cron(5 16 * * ? *)` (todos los días a las 16:05), *Flexible time window*: Off.
 3. Target: **AWS Step Functions StartExecution**, máquina `secop-batch-pipeline`, input `{}`.
 4. Permissions: *Use existing role* → `LabRole`. **Create schedule**.
 
@@ -182,7 +182,57 @@ La definición tiene un estado `LimpiarYUnir` (Glue `startJobRun.sync`, que espe
 
 ### A7. Resultados de la parte A
 
-_Se completa con los resultados de la ejecución iniciada por el horario._
+**Ejecución iniciada por el horario**: el 5 de noviembre de 2026 a las 16:05:42 (hora de Bogotá) EventBridge Scheduler inició la ejecución `ff6aecef-7cde-4eeb-bb20-50ad140b0285`. El trabajo inicial terminó y las dos ramas corrieron a la vez; la ejecución terminó con éxito a las 16:12:29. (A las 15:42 hubo una ejecución anterior, también exitosa, iniciada por el mismo horario; con ella encontramos los valores atípicos de `precio_base` que se explican abajo.)
+
+**Conteos del trabajo inicial** (log de CloudWatch, `results/glue_clean_join_conteos.txt`):
+
+| Métrica | Valor |
+| --- | --- |
+| Procesos leídos (CSV) | 7.781.911 |
+| Proponentes leídos (CSV) | 2.362.926 |
+| Procesos descartados por id o fecha inválidos | 0 |
+| Procesos duplicados descartados (mismo `id_del_proceso`) | 329.840 |
+| Precios corregidos a nulo (≤ 0 o > 5 billones de COP) | 224.567 |
+| Procesos escritos en Parquet | **7.452.071** |
+| Procesos con al menos una oferta (resultado del join) | 459.094 |
+
+Parquet escrito por partición: 2022: 986.054 · 2023: 1.468.513 · 2024: 1.598.448 · 2025: 1.855.301 · 2026: 1.543.755.
+
+**Rama 1. Pregunta**: ¿en qué departamentos los procesos que reciben ofertas tienen menos competencia, es decir, mayor porcentaje de procesos con un solo oferente? (departamentos con al menos 1.000 procesos con ofertas, 2022-2026)
+
+| Departamento | Procesos con ofertas | % con un solo oferente | Promedio de oferentes |
+| --- | --- | --- | --- |
+| Arauca | 4.700 | 67,6 | 1,71 |
+| Boyacá | 29.924 | 66,4 | 2,03 |
+| Caquetá | 5.887 | 64,3 | 2,12 |
+| Putumayo | 4.180 | 63,8 | 1,93 |
+| Casanare | 7.317 | 61,4 | 1,91 |
+| La Guajira | 4.677 | 61,1 | 2,13 |
+| Meta | 12.069 | 59,2 | 2,19 |
+| Amazonas | 2.047 | 58,9 | 2,08 |
+| Norte de Santander | 10.831 | 58,8 | 2,12 |
+| Antioquia | 52.411 | 56,2 | 2,71 |
+
+Respuesta: en el país, el 47,4 % de los procesos con ofertas recibe una sola. En Arauca, Boyacá, Caquetá y Putumayo pasa en casi dos de cada tres. Esos departamentos son donde una MiPyme que se presente tiene menos rivales, y donde el Estado más se beneficiaría de atraer oferentes: el recomendador debería priorizar allí sus alertas.
+
+**Rama 2. Pregunta**: ¿qué tipos de contrato y modalidades concentran el mayor presupuesto publicado, y qué parte de ese presupuesto se contrata de forma directa (sin competencia)?
+
+| Tipo de contrato | Modalidad | Procesos | Presupuesto (miles de millones COP) | Precio mediano (millones COP) |
+| --- | --- | --- | --- | --- |
+| Otro | Contratación régimen especial | 139.373 | 228.312 | 45,0 |
+| Prestación de servicios | Contratación régimen especial | 1.521.630 | 188.105 | 8,7 |
+| Obra | Licitación pública Obra Pública | 12.780 | 183.325 | 2.758,2 |
+| Prestación de servicios | Contratación directa | 3.130.675 | 134.888 | 17,2 |
+| Decreto 092 de 2017 | Contratación régimen especial | 1.222.022 | 109.845 | 8,0 |
+
+| ¿Contratación directa? | Procesos | % de procesos | % del presupuesto |
+| --- | --- | --- | --- |
+| No | 4.159.780 | 55,8 | 79,6 |
+| Sí | 3.292.261 | 44,2 | 20,4 |
+
+Respuesta: el mayor presupuesto está en el régimen especial y en la licitación pública de obra (pocos procesos, de unos 2.758 millones de mediana). La contratación directa es el 44,2 % de los procesos pero solo el 20,4 % del presupuesto, y la mayoría son contratos de prestación de servicios de unos 17 millones. Para el recomendador, las oportunidades abiertas a competencia con más dinero están en las licitaciones de obra y en la selección abreviada; la contratación directa es mucho volumen de bajo valor que no admite ofertas.
+
+Salidas completas de Athena en `results/athena_resultados.txt`.
 
 ---
 
@@ -242,7 +292,7 @@ python reset_streaming.py                       # tablas y stream/raw/ en cero
 python producer.py --stream secop-procesos --minutes 6 --rate 5
 ```
 
-Publica en lotes de 5 eventos por segundo (`PutRecords`) durante 6 minutos. Cerca del 7 % son repetidos (se reenvía un evento ya enviado, con el mismo `event_id` y la misma partition key) y cerca del 6 % son inválidos de cinco tipos. Al final escribe `producer_counts.json` con lo publicado.
+Publica lotes de 5 eventos (`PutRecords`) cada segundo durante 6 minutos (en nuestra corrida, 1.400 eventos: unos 4 por segundo, por la latencia de red). Cerca del 7 % son repetidos (se reenvía un evento ya enviado, con el mismo `event_id` y la misma partition key) y cerca del 6 % son inválidos de cinco tipos. Al final escribe `producer_counts.json` con lo publicado.
 
 ### B5. Consultas y conteos
 
@@ -299,4 +349,23 @@ El Learner Lab tiene un presupuesto de USD 50. Lo que más cuesta es Glue (USD 0
 
 ## Declaración de uso de IA
 
-_Se completa al final._
+El equipo usó **Claude (Anthropic), mediante Claude Code**, como asistente durante todo el trabajo. Declaramos explícitamente qué partes generó la IA:
+
+| Parte | Generado por IA | Rol del equipo |
+| --- | --- | --- |
+| Script de descarga (`scripts/download_secop.py`) | Sí, el código | Elegir los datasets del proyecto integrador, las columnas y los años |
+| Scripts de PySpark de Glue (`glue/*.py`) | Sí, el código | Definir las reglas de limpieza, la columna de join, la columna de partición y las dos preguntas de analítica |
+| Definición de Step Functions (ASL) y consultas de Athena (`athena/queries.sql`) | Sí | Revisar el flujo (inicial → paralelo) y validar los resultados |
+| Productor, Lambdas y scripts de consulta (`streaming/*.py`) | Sí, el código | Definir el evento, la categoría, el rango válido, cómo reconocer repetidos y la pregunta de DynamoDB |
+| Creación de recursos en la consola de AWS | La IA operó la consola desde el navegador con la sesión del equipo, clic a clic (no se usó infraestructura como código) | Supervisar cada recurso creado y su configuración |
+| Este informe (README) y el guion del video | Sí, el borrador del texto | Revisar, corregir y apropiar el contenido |
+| Conclusiones y respuestas a las preguntas | Redactadas por la IA a partir de los resultados reales de las consultas | Verificar las cifras en la consola y validar su interpretación |
+| Video y sustentación | No | Los integrantes graban, explican y responden |
+
+Errores encontrados y corregidos durante el proceso (los conocemos y podemos explicarlos):
+
+- La Lambda de ventanas fallaba porque `total` es una palabra reservada de DynamoDB; se corrigió con `ExpressionAttributeNames`.
+- En la primera corrida del productor los triggers de Kinesis con posición *Latest* aún no leían y se perdieron los primeros eventos; se repitió la corrida con los triggers activos.
+- Los 21 procesos con `precio_base` mayor que 5 billones de COP (máximo 2,7 × 10¹⁶, un error de digitación) distorsionaban la agrupación de presupuesto; se agregó la regla de limpieza correspondiente y se volvió a ejecutar el pipeline.
+
+Cada integrante revisó el código y los resultados y responde por ellos en la sustentación.

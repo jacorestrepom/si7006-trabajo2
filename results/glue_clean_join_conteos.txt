@@ -1,0 +1,2 @@
+[conteos] procesos_leidos=7781911 proponentes_leidos=2362926 procesos_descartados_invalidos=0 procesos_duplicados_descartados=329840 precios_corregidos_a_nulo=224567 procesos_escritos=7452071 procesos_con_ofertas=459094
+
