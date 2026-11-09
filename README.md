@@ -29,7 +29,7 @@
 
 ## Resumen
 
-Equipo 8: David Lopera, Juan Diego Acuña, Nicolás Hurtado, José Alejandro Duque y Jacobo Restrepo.
+Nicolás Hurtado & Jacobo Restrepo.
 
 Nuestro proyecto integrador es un **recomendador de contratos públicos**: a partir de los procesos de compra del Estado colombiano publicados en SECOP II, queremos mostrarle a cada empresa pequeña los procesos abiertos donde tiene más probabilidad de ganar. Este trabajo construye en AWS las dos piezas de datos que ese sistema necesita:
 
