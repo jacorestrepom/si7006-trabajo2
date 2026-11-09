@@ -6,3 +6,6 @@ __pycache__/
 *.pyc
 .DS_Store
 .venv/
+
+# Material personal de apoyo (no es parte del proyecto)
+docs/
