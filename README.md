@@ -362,5 +362,4 @@ Se usaron herramientas de IA generativa en estas partes del trabajo:
 | Parte | Uso de IA |
 | --- | --- |
 | Código: `scripts/`, `glue/`, `streaming/`, `stepfunctions/`, `athena/` | Generación del código |
-| Creación de los recursos en la consola de AWS | Operación asistida de la consola (sin infraestructura como código) |
 | Informe (este README) | Redacción del texto y de las conclusiones a partir de los resultados de las consultas |
