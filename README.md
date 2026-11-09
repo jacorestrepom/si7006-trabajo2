@@ -22,7 +22,8 @@
     - [B6. Resultados de la parte B](#b6-resultados-de-la-parte-b)
   - [Evidencia de que no hay infraestructura como código](#evidencia-de-que-no-hay-infraestructura-como-código)
   - [Costos y limpieza](#costos-y-limpieza)
-  - [Declaración de uso de IA](#declaración-de-uso-de-ia)
+  - [Problemas encontrados](#problemas-encontrados)
+  - [Uso de IA](#uso-de-ia)
 
 ---
 
@@ -347,25 +348,19 @@ El Learner Lab tiene un presupuesto de USD 50. Lo que más cuesta es Glue (USD 0
 6. Athena: `DROP DATABASE secop_trabajo2 CASCADE;`
 7. S3: vaciar y borrar `secop-trabajo2-equipo8-usw2`.
 
-## Declaración de uso de IA
-
-El equipo usó **Claude (Anthropic), mediante Claude Code**, como asistente durante todo el trabajo. Declaramos explícitamente qué partes generó la IA:
-
-| Parte | Generado por IA | Rol del equipo |
-| --- | --- | --- |
-| Script de descarga (`scripts/download_secop.py`) | Sí, el código | Elegir los datasets del proyecto integrador, las columnas y los años |
-| Scripts de PySpark de Glue (`glue/*.py`) | Sí, el código | Definir las reglas de limpieza, la columna de join, la columna de partición y las dos preguntas de analítica |
-| Definición de Step Functions (ASL) y consultas de Athena (`athena/queries.sql`) | Sí | Revisar el flujo (inicial → paralelo) y validar los resultados |
-| Productor, Lambdas y scripts de consulta (`streaming/*.py`) | Sí, el código | Definir el evento, la categoría, el rango válido, cómo reconocer repetidos y la pregunta de DynamoDB |
-| Creación de recursos en la consola de AWS | La IA operó la consola desde el navegador con la sesión del equipo, clic a clic (no se usó infraestructura como código) | Supervisar cada recurso creado y su configuración |
-| Este informe (README) y el guion del video | Sí, el borrador del texto | Revisar, corregir y apropiar el contenido |
-| Conclusiones y respuestas a las preguntas | Redactadas por la IA a partir de los resultados reales de las consultas | Verificar las cifras en la consola y validar su interpretación |
-| Video y sustentación | No | Los integrantes graban, explican y responden |
-
-Errores encontrados y corregidos durante el proceso (los conocemos y podemos explicarlos):
+## Problemas encontrados
 
 - La Lambda de ventanas fallaba porque `total` es una palabra reservada de DynamoDB; se corrigió con `ExpressionAttributeNames`.
 - En la primera corrida del productor los triggers de Kinesis con posición *Latest* aún no leían y se perdieron los primeros eventos; se repitió la corrida con los triggers activos.
 - Los 21 procesos con `precio_base` mayor que 5 billones de COP (máximo 2,7 × 10¹⁶, un error de digitación) distorsionaban la agrupación de presupuesto; se agregó la regla de limpieza correspondiente y se volvió a ejecutar el pipeline.
+- Cuando la sesión del Learner Lab se apaga, AWS deshabilita los triggers de Kinesis de las Lambdas; al iniciar una sesión nueva hay que activarlos otra vez (Lambda → Configuration → Triggers → Edit → *Activate trigger*).
 
-Cada integrante revisó el código y los resultados y responde por ellos en la sustentación.
+## Uso de IA
+
+Se usaron herramientas de IA generativa en estas partes del trabajo:
+
+| Parte | Uso de IA |
+| --- | --- |
+| Código: `scripts/`, `glue/`, `streaming/`, `stepfunctions/`, `athena/` | Generación del código |
+| Creación de los recursos en la consola de AWS | Operación asistida de la consola (sin infraestructura como código) |
+| Informe (este README) | Redacción del texto y de las conclusiones a partir de los resultados de las consultas |
