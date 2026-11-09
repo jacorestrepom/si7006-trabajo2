@@ -1,0 +1,5 @@
+Productor  -> publicados=1780 (unicos=1536, repetidos=123, invalidos=121)
+Lambda     -> unicos_procesados=1536  repetidos_descartados=123  invalidos_descartados=121  recibidos=1780
+S3 crudos  -> 1780 eventos   |   secop-invalid-events -> 121 filas
+
+1780 publicados = 1536 + 123 + 121 = 1780  ->  CUADRA

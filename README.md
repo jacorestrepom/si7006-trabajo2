@@ -171,7 +171,7 @@ La definición tiene un estado `LimpiarYUnir` (Glue `startJobRun.sync`, que espe
 ### A5. Horario de Amazon EventBridge Scheduler
 
 1. **EventBridge → Scheduler → Schedules → Create schedule**, nombre `secop-batch-diario`.
-2. *Recurring schedule*, zona horaria `America/Bogota`, *Cron-based*: `cron(5 16 * * ? *)` (todos los días a las 16:05), *Flexible time window*: Off.
+2. *Recurring schedule*, zona horaria `America/Bogota`, *Cron-based*: `cron(25 14 * * ? *)` (todos los días a las 14:25; la hora se ha ido moviendo para lanzar ejecuciones de prueba), *Flexible time window*: Off.
 3. Target: **AWS Step Functions StartExecution**, máquina `secop-batch-pipeline`, input `{}`.
 4. Permissions: *Use existing role* → `LabRole`. **Create schedule**.
 
@@ -304,7 +304,7 @@ Publica lotes de 5 eventos (`PutRecords`) cada segundo durante 6 minutos (en nue
 
 ### B6. Resultados de la parte B
 
-Corrida del 5 de noviembre de 2026 (salidas completas en `results/`):
+Corrida del 5 de noviembre de 2026 (salidas completas en `results/`). El 9 de noviembre se repitió antes de la sustentación: 1.780 publicados = 1.536 + 123 + 121, también cuadra (`results/verify_counts_2026-11-09.txt`); esos son los datos que hoy están en DynamoDB y S3.
 
 ```text
 Productor  -> publicados=1400 (unicos=1224, repetidos=86, invalidos=90)
